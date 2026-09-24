@@ -1,5 +1,13 @@
-FROM python:3.12-slim-bookworm
+FROM python:3.13-slim-bookworm
 COPY --from=ghcr.io/astral-sh/uv:0.8.22 /uv /uvx /bin/
+
+# Use the image's interpreter. Without this, uv downloads a managed
+# Python matching .python-version into the user's data directory, which
+# fails for the non-root user (no writable HOME) and would duplicate
+# the interpreter this base image provides. The base image version must
+# match .python-version; a mismatch fails the build with a version
+# error.
+ENV UV_PYTHON_DOWNLOADS=never
 
 # uv needs the git CLI to fetch the dscim git dependency.
 RUN apt-get -qq update \
