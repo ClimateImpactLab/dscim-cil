@@ -1,0 +1,50 @@
+# EPA SC-CO2: sector CAMEL_m1_c0.20, risk_aversion, euler_ramsey,
+# seven pulse years, EPA's three published Ramsey calibrations.
+# Paths are relative to the data directory setup.sh prepares; run the
+# commands from there.
+mode: rff
+
+climate:
+  gases: [CO2_Fossil]
+  gmst_path: ""
+  gmsl_path: ""
+  gmst_fair_path: dscim-facts-epa/input/climate/gmst_pulse.nc4
+  gmsl_fair_path: dscim-facts-epa/input/climate/gmsl_pulse.nc4
+  gas_conversions:                 # from dscim-facts-epa scripts/directory_setup.py
+    CO2_Fossil: 2.72916487e-10
+    CH4: 2.5e-08
+    N2O: 6.36480131e-07
+  emission_scenarios: null
+  ecs_mask_path: null
+
+econ:
+  path: dscim-facts-epa/input/econ/rff_global_socioeconomics.nc4
+
+paths:
+  results: results
+
+sectors:
+  CAMEL_m1_c0.20:
+    formula: "damages ~ -1 + anomaly + np.power(anomaly, 2) + gmsl + np.power(gmsl, 2)"
+    damage_function_path: dfc_library/CAMEL_m1_c0.20
+
+menu:
+  fair_aggregation: []
+  weitzman_parameter: [0.5]
+  save_files: [uncollapsed_sccs, uncollapsed_marginal_damages,
+               uncollapsed_discount_factors, global_consumption_no_pulse]
+
+sweep:
+  sectors: [CAMEL_m1_c0.20]
+  pulse_years: [2020, 2030, 2040, 2050, 2060, 2070, 2080]
+  menu_pairs:
+    - {recipe: risk_aversion, discounting: euler_ramsey}
+  eta_rho: [[1.016010255, 9.149608e-05],
+            [1.244459066, 0.00197263997],
+            [1.421158116, 0.00461878399]]
+
+scc:
+  deflator: 1.0120936859916287     # 113.648 / 112.29, 2019 USD to 2020 USD
+                                   # (dscim-facts-epa scghg_utils.py)
+  collapse: certainty_equivalent
+  output: results/scghgs
