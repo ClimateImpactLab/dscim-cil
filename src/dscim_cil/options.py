@@ -225,7 +225,7 @@ class Combination:
     kind :
         ``"requires"`` or ``"forbidden"``.
     description :
-        The rule as one sentence; rendered by ``dscim-cli compat``.
+        The rule as one sentence; rendered by ``dscim-cil compat``.
     citation :
         Source backing the rule.
     modes :
@@ -242,7 +242,7 @@ class Combination:
 
 @dataclass(frozen=True)
 class Stage:
-    """One pipeline stage: a dscim-cli command with its data flow.
+    """One pipeline stage: a dscim-cil command with its data flow.
 
     Parameters
     ----------
@@ -585,7 +585,7 @@ _OPTIONS = (
     ),
     Option(
         "ce_path",
-        "Directory of reduced-damage zarrs; derived by dscim-cli from "
+        "Directory of reduced-damage zarrs; derived by dscim-cil from "
         "paths.reduced_damages_library and the sector, not set directly.",
         ("fit",),
         None,
@@ -665,7 +665,7 @@ _OPTIONS = (
                     "Not a valid member: marginal_damages has no branch "
                     "for it and raises NotImplementedError, which breaks "
                     "calculate_scc. The uncollapsed pipeline is reached "
-                    "by fair_aggregation: [] plus the dscim-cli scc "
+                    "by fair_aggregation: [] plus the dscim-cil scc "
                     "command, which composes SCCs from the uncollapsed "
                     "outputs."
                 ),

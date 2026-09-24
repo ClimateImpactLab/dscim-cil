@@ -25,7 +25,7 @@ import yaml
 from dscim.menu.main_recipe import MainRecipe
 from dscim.menu.simple_storage import Climate, EconVars
 
-from dscim_cli.config import (
+from dscim_cil.config import (
     Run,
     _coefficient_file,
     config_provenance,
@@ -67,7 +67,7 @@ def _warn_if_untested(installed_version: str) -> None:
     ):
         warnings.warn(
             f"installed dscim {installed_version} is not the version "
-            f"dscim-cli is tested against (main @ {tested}); runs will "
+            f"dscim-cil is tested against (main @ {tested}); runs will "
             f"proceed and run metadata records the actual version",
             stacklevel=2,
         )
@@ -380,7 +380,7 @@ def _write_metadata(
         "started": started,
         "finished": finished,
         "invocation": invocation,
-        "dscim_cli_version": _versions().get("dscim-cli", "not installed"),
+        "dscim_cil_version": _versions().get("dscim-cil", "not installed"),
         "dscim_version": dscim_version,
         "dscim_commit": _dscim_commit(dscim_version),
         "dependencies": _versions(),
@@ -448,7 +448,7 @@ def _config_file(config: dict) -> str:
     ``sum_AMEL`` and ``reduce_damages`` take a config path and re-read
     it from disk, so overrides must be written out to reach them.
     """
-    descriptor, name = tempfile.mkstemp(suffix=".yaml", prefix="dscim-cli-")
+    descriptor, name = tempfile.mkstemp(suffix=".yaml", prefix="dscim-cil-")
     with os.fdopen(descriptor, "w") as handle:
         yaml.safe_dump(config, handle)
     return name

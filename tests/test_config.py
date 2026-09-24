@@ -2,7 +2,7 @@
 
 import pytest
 
-from dscim_cli.config import (
+from dscim_cil.config import (
     ConfigError,
     apply_overrides,
     apply_selectors,
@@ -397,7 +397,7 @@ def test_render_summary_groups_missing_by_producer():
     report = render_summary(config, runs)
     assert f"runs: {len(runs)}" in report
     assert "external: provide these files" in report
-    assert "produced by `dscim-cli reduce CONFIG`" in report
+    assert "produced by `dscim-cil reduce CONFIG`" in report
     assert f"blocked runs: {len(runs)} of {len(runs)}" in report
     assert "--verbose" in report
 
@@ -450,7 +450,7 @@ def test_combine_rejected_in_rff():
 
 
 def test_settings_summary_separates_config_from_default():
-    from dscim_cli.config import settings_summary
+    from dscim_cil.config import settings_summary
 
     report = settings_summary(ssp_config())
     assert "settings:" in report
@@ -469,7 +469,7 @@ def test_settings_summary_separates_config_from_default():
 
 
 def test_settings_summary_marks_flag_sources():
-    from dscim_cli.config import settings_summary
+    from dscim_cil.config import settings_summary
 
     config = apply_selectors(ssp_config(), sectors=("AMEL_m0",))
     report = settings_summary(config, sources={"sweep.sectors": "flag"})
@@ -480,7 +480,7 @@ def test_settings_summary_marks_flag_sources():
 
 
 def test_effective_settings_without_config_shows_requirements():
-    from dscim_cli.config import effective_settings
+    from dscim_cil.config import effective_settings
 
     rows = {name: (value, origin) for name, value, origin in effective_settings(None)}
     assert rows["eta"] == (1.421158116, "required: you must set this")
@@ -490,7 +490,7 @@ def test_effective_settings_without_config_shows_requirements():
 
 
 def test_config_provenance_covers_defaults():
-    from dscim_cli.config import config_provenance
+    from dscim_cil.config import config_provenance
 
     provenance = config_provenance(ssp_config())
     assert provenance["ext_method"] == "default"

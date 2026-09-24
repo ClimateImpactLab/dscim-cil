@@ -42,7 +42,7 @@ sectors:
 
 menu:
   # Empty list: skip the collapsed-SCC computation inside dscim and keep
-  # the uncollapsed outputs; `dscim-cli scc` composes SCCs from them.
+  # the uncollapsed outputs; `dscim-cil scc` composes SCCs from them.
   # global_consumption_no_pulse feeds the certainty_equivalent collapse.
   fair_aggregation: []
   weitzman_parameter: [0.5]
@@ -58,7 +58,7 @@ sweep:
     - [1.421158116, 0.00461878399]
   # masks: / fair_dims: axes are a validation error in rff mode.
 
-# Consumed by `dscim-cli scc`: compose SCCs from the uncollapsed
+# Consumed by `dscim-cil scc`: compose SCCs from the uncollapsed
 # outputs, deflate, and collapse across runid. damages_from and
 # discounting_from may point at a different results root, e.g.
 # territorial-US damages against global discounting.

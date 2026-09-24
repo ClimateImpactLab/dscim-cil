@@ -1,7 +1,7 @@
 """Catalogue integrity tests."""
 
-from dscim_cli.config import COMBINATION_CHECKERS
-from dscim_cli.options import (
+from dscim_cil.config import COMBINATION_CHECKERS
+from dscim_cil.options import (
     CATALOGUE,
     COMPATIBILITY,
     DEFAULT_SAVE_FILES,
@@ -100,7 +100,7 @@ def test_reasons_state_dscim_facts_not_roadmap():
 
 
 def test_config_required_split():
-    from dscim_cli.options import REQUIRED
+    from dscim_cil.options import REQUIRED
 
     required = {name for name, opt in CATALOGUE.items() if opt.config_required}
     assert {
@@ -120,7 +120,7 @@ def test_config_required_split():
 
 
 def test_pipeline_stages_carry_citations_and_flow():
-    from dscim_cli.options import PIPELINE
+    from dscim_cil.options import PIPELINE
 
     names = [stage.name for stage in PIPELINE]
     assert names == ["sum-sectors", "reduce", "run", "combine", "scc"]

@@ -1,9 +1,9 @@
-# dscim-cli
+# dscim-cil
 
-[![Tests](https://github.com/C1587S/dscim-cli/actions/workflows/test.yml/badge.svg)](https://github.com/C1587S/dscim-cli/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/C1587S/dscim-cli/graph/badge.svg)](https://codecov.io/gh/C1587S/dscim-cli)
-[![container](https://github.com/C1587S/dscim-cli/actions/workflows/container.yml/badge.svg)](https://github.com/C1587S/dscim-cli/actions/workflows/container.yml)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/C1587S/dscim-cli/HEAD?labpath=examples%2Fdemo.ipynb)
+[![Tests](https://github.com/C1587S/dscim-cil/actions/workflows/test.yml/badge.svg)](https://github.com/C1587S/dscim-cil/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/C1587S/dscim-cil/graph/badge.svg)](https://codecov.io/gh/C1587S/dscim-cil)
+[![container](https://github.com/C1587S/dscim-cil/actions/workflows/container.yml/badge.svg)](https://github.com/C1587S/dscim-cil/actions/workflows/container.yml)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/C1587S/dscim-cil/HEAD?labpath=examples%2Fdemo.ipynb)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue)](pyproject.toml)
 
 A command-line interface to [dscim](https://github.com/ClimateImpactLab/dscim),
@@ -12,8 +12,6 @@ of dscim's run modes from one YAML config: EPA/RFF (10,000
 probabilistic draws over a `runid` dimension, precomputed damage
 functions) and discrete SSP/RCP (enumerated scenarios, damage functions
 fitted during the run).
-
-Not yet used against production-scale data.
 
 ## Installation
 
@@ -39,11 +37,11 @@ commit that produced it.
 No data needed:
 
 ```shell
-dscim-cli stages                      # the pipeline and its dimension collapses
-dscim-cli options                     # the full option surface
-dscim-cli explain fair_aggregation    # one option in detail
-dscim-cli constraints                 # cross-option validity rules
-dscim-cli defaults                    # dscim's defaults and what you must set
+dscim-cil stages                      # the pipeline and its dimension collapses
+dscim-cil options                     # the full option surface
+dscim-cil explain fair_aggregation    # one option in detail
+dscim-cil constraints                 # cross-option validity rules
+dscim-cil defaults                    # dscim's defaults and what you must set
 ```
 
 [examples/demo.ipynb](examples/demo.ipynb) runs the walkthrough on
@@ -67,7 +65,7 @@ generated fixtures; the Binder badge above launches it.
 | `defaults [CONFIG]` | Every effective value and where it came from. |
 
 Every command taking a config accepts `-c KEY=VALUE` overrides (dotted
-keys, YAML-parsed values); options can also be set through `DSCIM_CLI_*`
+keys, YAML-parsed values); options can also be set through `DSCIM_CIL_*`
 environment variables. Start from
 [examples/minimal.yaml](examples/minimal.yaml); the full surface is in
 [examples/ssp.yaml](examples/ssp.yaml) and
@@ -76,11 +74,11 @@ environment variables. Start from
 ## Running
 
 ```shell
-dscim-cli validate config.yml
-dscim-cli plan config.yml
-dscim-cli run config.yml --dry-run
-dscim-cli run config.yml --resume
-dscim-cli scc config.yml
+dscim-cil validate config.yml
+dscim-cil plan config.yml
+dscim-cil run config.yml --dry-run
+dscim-cil run config.yml --resume
+dscim-cil scc config.yml
 ```
 
 Values that select the scientific result (eta, rho, recipe,
@@ -89,24 +87,22 @@ defaults for them are shown by `explain` but never applied silently.
 
 ## dscim versions
 
-dscim-cli targets dscim `main`, pinned to the commit in the `run` extra.
-Not related to `dscim-cil`, the former name of the dscim-research
-repository.
+dscim-cil targets dscim `main`, pinned to the commit in the `run` extra.
 
 ## Container
 
 Published to ghcr on every push to main (`edge`) and on version tags:
 
 ```shell
-docker pull ghcr.io/c1587s/dscim-cli:edge
+docker pull ghcr.io/c1587s/dscim-cil:edge
 docker run --rm -v ./conf:/mnt/conf:ro -v ./data:/mnt/data \
-    ghcr.io/c1587s/dscim-cli:edge run /mnt/conf/config.yml
+    ghcr.io/c1587s/dscim-cil:edge run /mnt/conf/config.yml
 ```
 
 Or build locally:
 
 ```shell
-docker build -t dscim-cli:dev .
+docker build -t dscim-cil:dev .
 ```
 
 ## Development

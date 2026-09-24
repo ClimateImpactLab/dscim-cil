@@ -11,7 +11,7 @@ import os
 
 import xarray as xr
 
-from dscim_cli.config import Run, expand_sweep, save_path_for
+from dscim_cil.config import Run, expand_sweep, save_path_for
 
 __all__ = ["compose"]
 
@@ -62,7 +62,7 @@ def compose(config: dict, runs: list[Run] | None = None) -> list[str]:
         for path in (damages_file, factors_file):
             if not os.path.exists(path):
                 raise FileNotFoundError(
-                    f"{path} is missing; run `dscim-cli run` (with "
+                    f"{path} is missing; run `dscim-cil run` (with "
                     f"uncollapsed_marginal_damages and "
                     f"uncollapsed_discount_factors in save_files) first"
                 )

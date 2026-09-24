@@ -12,7 +12,7 @@ from typing import Any
 
 import yaml
 
-from dscim_cli.options import (
+from dscim_cil.options import (
     CATALOGUE,
     COMPATIBILITY,
     DEFAULT_SAVE_FILES,
@@ -129,7 +129,7 @@ class Run:
 
 @dataclass(frozen=True)
 class Input:
-    """One input file, with the dscim-cli command that produces it.
+    """One input file, with the dscim-cil command that produces it.
 
     ``producer`` is empty for external inputs the user supplies.
     """
@@ -1302,7 +1302,7 @@ def render_summary(config: dict, runs: list[Run]) -> str:
                 lines.append(f"  external: provide these files ({len(entries)}):")
             else:
                 lines.append(
-                    f"  produced by `dscim-cli {producer} CONFIG` ({len(entries)}):"
+                    f"  produced by `dscim-cil {producer} CONFIG` ({len(entries)}):"
                 )
             for entry in entries:
                 lines.append(f"    {entry.path}  [{entry.kind}]")
@@ -1335,7 +1335,7 @@ def render_plan(
             if os.path.exists(entry.path):
                 tag = "ok"
             elif entry.producer:
-                tag = f"MISSING -> dscim-cli {entry.producer}"
+                tag = f"MISSING -> dscim-cil {entry.producer}"
             else:
                 tag = "MISSING (external)"
             lines.append(f"    in  [{tag}] {entry.path}")

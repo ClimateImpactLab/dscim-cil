@@ -6,7 +6,7 @@ RUN apt-get -qq update \
     && apt-get -qq install --yes --no-install-recommends git \
     && rm -rf /var/lib/apt/lists/*
 
-ARG APP_HOME="/opt/dscim-cli"
+ARG APP_HOME="/opt/dscim-cil"
 
 # Run without root permissions.
 USER 9876:9876
@@ -21,5 +21,5 @@ ENV PATH="${APP_HOME}/.venv/bin:$PATH"
 
 # Mount configs and data as volumes, e.g.
 #   docker run --rm -v ./conf:/mnt/conf:ro -v ./data:/mnt/data \
-#       dscim-cli run /mnt/conf/config.yml
-ENTRYPOINT ["dscim-cli"]
+#       dscim-cil run /mnt/conf/config.yml
+ENTRYPOINT ["dscim-cil"]

@@ -16,8 +16,8 @@ import fixture_factory
 import numpy as np
 import yaml
 
-from dscim_cli import runner
-from dscim_cli.config import expand_sweep, run_outputs, validate_config
+from dscim_cil import runner
+from dscim_cil.config import expand_sweep, run_outputs, validate_config
 
 dask.config.set(scheduler="single-threaded")
 
@@ -140,8 +140,8 @@ def test_fair_dims_collapse_matches_direct_call(ssp_setup):
 
 @pytest.mark.full_matrix
 @pytest.mark.skipif(
-    not os.environ.get("DSCIM_CLI_FULL_MATRIX"),
-    reason="set DSCIM_CLI_FULL_MATRIX=1 to run the full recipe x discounting cross",
+    not os.environ.get("DSCIM_CIL_FULL_MATRIX"),
+    reason="set DSCIM_CIL_FULL_MATRIX=1 to run the full recipe x discounting cross",
 )
 @pytest.mark.parametrize("recipe", ("risk_aversion", "equity"))
 @pytest.mark.parametrize("discounting", EXTRA_DISCOUNTINGS)
@@ -180,14 +180,14 @@ def test_resume_skips_completed_runs(tmp_path):
 def test_metadata_records_dscim_commit_and_resolved_config(tmp_path):
     config = fixture_factory.rff_fixture_config(tmp_path)
     runs = expand_sweep(config)
-    lines = runner.execute(config, runs, invocation="dscim-cli run conf.yml")
+    lines = runner.execute(config, runs, invocation="dscim-cil run conf.yml")
     metadata_path = lines[0].split("metadata: ")[1].rstrip(")")
     with open(metadata_path) as stream:
         record = yaml.safe_load(stream)
 
     assert record["dscim_commit"] != "unknown"
     assert record["dscim_version"].startswith("0.")
-    assert record["invocation"] == "dscim-cli run conf.yml"
+    assert record["invocation"] == "dscim-cil run conf.yml"
     assert record["run"]["recipe"] == "risk_aversion"
     # resolved config makes non-scientific defaults explicit ...
     assert record["resolved_config"]["menu"]["ext_method"] == "global_c_ratio"
@@ -244,7 +244,7 @@ def test_preflight_rejects_short_gmst_csv(tmp_path):
 
 
 def test_preflight_rejects_uninstalled_discounting(tmp_path):
-    from dscim_cli.config import Run
+    from dscim_cil.config import Run
 
     config = fixture_factory.rff_fixture_config(tmp_path)
     fake = Run(
@@ -404,7 +404,7 @@ def rff_with_outputs(tmp_path_factory):
 
 
 def test_scc_compose_mean(rff_with_outputs):
-    from dscim_cli import scc as composer
+    from dscim_cil import scc as composer
 
     config = yaml.safe_load(yaml.safe_dump(rff_with_outputs))
     config["scc"] = {
@@ -421,7 +421,7 @@ def test_scc_compose_mean(rff_with_outputs):
 
 
 def test_scc_compose_certainty_equivalent_and_cross_root(rff_with_outputs):
-    from dscim_cli import scc as composer
+    from dscim_cil import scc as composer
 
     config = yaml.safe_load(yaml.safe_dump(rff_with_outputs))
     config["scc"] = {

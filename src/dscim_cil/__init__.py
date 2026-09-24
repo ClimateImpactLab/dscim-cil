@@ -1,6 +1,6 @@
 """Config-driven command-line interface to dscim."""
 
-from dscim_cli.config import (
+from dscim_cil.config import (
     ConfigError,
     Run,
     apply_overrides,
@@ -9,7 +9,7 @@ from dscim_cli.config import (
     render_plan,
     validate_config,
 )
-from dscim_cli.options import CATALOGUE, COMPATIBILITY, Combination, Option, Value
+from dscim_cil.options import CATALOGUE, COMPATIBILITY, Combination, Option, Value
 
 __all__ = [
     "CATALOGUE",

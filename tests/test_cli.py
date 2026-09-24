@@ -5,7 +5,7 @@ import pathlib
 import yaml
 from click.testing import CliRunner
 
-from dscim_cli.cli import main
+from dscim_cil.cli import main
 
 EXAMPLES = pathlib.Path(__file__).parent.parent / "examples"
 
@@ -27,7 +27,7 @@ def test_dry_run_default_is_summary(tmp_path):
     assert "runs: 6" in result.output
     assert "missing inputs:" in result.output
     assert "external: provide these files" in result.output
-    assert "produced by `dscim-cli reduce CONFIG`" in result.output
+    assert "produced by `dscim-cil reduce CONFIG`" in result.output
     assert "blocked runs:" in result.output
     # summary, not per-run detail
     assert "[1] sector=" not in result.output
@@ -59,7 +59,7 @@ def test_dry_run_runs_selection(tmp_path):
 def test_dry_run_missing_reduced_names_producer():
     result = invoke("run", str(EXAMPLES / "minimal.yaml"), "--dry-run", "--verbose")
     assert result.exit_code == 0, result.output
-    assert "MISSING -> dscim-cli reduce" in result.output
+    assert "MISSING -> dscim-cil reduce" in result.output
 
 
 def test_selector_flags_narrow_sweep():
@@ -112,7 +112,7 @@ def test_envvar_prefix_is_active():
     result = invoke(
         "run",
         str(EXAMPLES / "ssp.yaml"),
-        env={"DSCIM_CLI_RUN_DRY_RUN": "1"},
+        env={"DSCIM_CIL_RUN_DRY_RUN": "1"},
     )
     assert result.exit_code == 0, result.output
     assert "runs: 6" in result.output
@@ -124,7 +124,7 @@ def test_plan_lists_ordered_steps_with_status():
     assert "1. [blocked-by-" in result.output
     assert "sum-sectors: build AMEL_m0" in result.output
     assert "reduce: collapse batch" in result.output
-    assert "<- dscim-cli reduce" in result.output
+    assert "<- dscim-cil reduce" in result.output
 
 
 def test_stages_explains_dimension_collapses():
@@ -221,13 +221,13 @@ def test_output_is_plain_when_not_a_terminal():
     # same output as the explicit flag and the environment variable.
     default = invoke("stages")
     flagged = invoke("--plain", "stages")
-    via_env = invoke("stages", env={"DSCIM_CLI_PLAIN": "1"})
+    via_env = invoke("stages", env={"DSCIM_CIL_PLAIN": "1"})
     assert default.output == flagged.output == via_env.output
     assert "\x1b[" not in default.output  # no control characters
 
 
 def test_rich_path_renders_stages_tree(monkeypatch):
-    from dscim_cli import cli as cli_module
+    from dscim_cil import cli as cli_module
 
     monkeypatch.setattr(cli_module, "_stdout_is_terminal", lambda: True)
     result = invoke("stages")
@@ -238,7 +238,7 @@ def test_rich_path_renders_stages_tree(monkeypatch):
 
 
 def test_rich_path_renders_plan_with_status_words(monkeypatch):
-    from dscim_cli import cli as cli_module
+    from dscim_cil import cli as cli_module
 
     monkeypatch.setattr(cli_module, "_stdout_is_terminal", lambda: True)
     result = invoke("plan", str(EXAMPLES / "ssp.yaml"))

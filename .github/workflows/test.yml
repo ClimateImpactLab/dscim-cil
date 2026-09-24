@@ -40,7 +40,7 @@ jobs:
       - run: uv sync --locked --group tests
       - run: >
           uv run pytest -m "not integration" -v --color=yes
-          --cov dscim_cli --cov-branch --cov-report term-missing
+          --cov dscim_cil --cov-branch --cov-report term-missing
           --cov-report xml tests
       - uses: codecov/codecov-action@v5
         with:
@@ -64,7 +64,7 @@ jobs:
       - run: |
           uv venv /tmp/smoke
           uv pip install --python /tmp/smoke/bin/python dist/*.whl
-          /tmp/smoke/bin/dscim-cli stages
+          /tmp/smoke/bin/dscim-cil stages
 
   integration:
     runs-on: ubuntu-latest
@@ -84,7 +84,7 @@ jobs:
       - run: uv sync --locked --group tests --extra run
       - run: >
           uv run pytest -v --color=yes
-          --cov dscim_cli --cov-branch --cov-report term-missing
+          --cov dscim_cil --cov-branch --cov-report term-missing
           --cov-report xml tests
       # pytest-cov writes coverage.xml even when tests fail, so upload
       # unless the job was cancelled; only a crash before pytest finishes

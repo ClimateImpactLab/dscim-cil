@@ -330,7 +330,7 @@ def ssp_fixture_config(path, *, etas: tuple[float, ...] = (2.0,)) -> dict:
     Returns
     -------
     dict
-        A dscim-cli config ready for validate/expand/execute.
+        A dscim-cil config ready for validate/expand/execute.
     """
     econ = write_econ(path)
     library = write_ce_zarrs(path, etas=etas)

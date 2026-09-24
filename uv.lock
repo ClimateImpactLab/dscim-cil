@@ -764,7 +764,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "dscim-cli"
+name = "dscim-cil"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

@@ -1,4 +1,4 @@
-name: dscim-cli-binder
+name: dscim-cil-binder
 channels:
   - conda-forge
 dependencies:

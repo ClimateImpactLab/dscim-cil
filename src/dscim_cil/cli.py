@@ -13,7 +13,7 @@ from rich.table import Table
 from rich.text import Text
 from rich.tree import Tree
 
-from dscim_cli.config import (
+from dscim_cil.config import (
     SUMMARY_OPTIONS,
     ConfigError,
     apply_overrides,
@@ -28,7 +28,7 @@ from dscim_cli.config import (
     summary_data,
     validate_config,
 )
-from dscim_cli.options import CATALOGUE, COMPATIBILITY, PIPELINE, REQUIRED, STATUSES
+from dscim_cil.options import CATALOGUE, COMPATIBILITY, PIPELINE, REQUIRED, STATUSES
 
 __all__ = ["main"]
 
@@ -149,7 +149,7 @@ def _fail(error: ConfigError) -> None:
 @click.group(
     context_settings={
         "help_option_names": ["-h", "--help"],
-        "auto_envvar_prefix": "DSCIM_CLI",
+        "auto_envvar_prefix": "DSCIM_CIL",
     }
 )
 @click.option("--log-level", default="INFO", show_default=True)
@@ -252,7 +252,7 @@ def run(
         return
 
     try:
-        runner = importlib.import_module("dscim_cli.runner")
+        runner = importlib.import_module("dscim_cil.runner")
     except ModuleNotFoundError as error:
         click.echo(
             f"error: real runs require dscim and its dependencies to be "
@@ -299,7 +299,7 @@ def plan(config_path: str, overrides: tuple[str, ...], allow_unsupported: bool) 
         click.echo(f"{index}. [{step.status()}] {step.title}")
         for entry in step.inputs:
             state = "ok" if os.path.exists(entry.path) else "missing"
-            source = f" <- dscim-cli {entry.producer}" if entry.producer else ""
+            source = f" <- dscim-cil {entry.producer}" if entry.producer else ""
             click.echo(f"     in  [{state}] {_display_path(entry.path, root)}{source}")
         for path in step.outputs:
             state = "exists" if os.path.exists(path) else "new"
@@ -381,7 +381,7 @@ def explain(option_name: str, values: tuple[str, ...]) -> None:
     if entry.config_required and entry.default is not REQUIRED:
         click.echo(
             f"  required in config; dscim would default to {entry.default!r} "
-            f"if unset, but dscim-cli never applies that silently"
+            f"if unset, but dscim-cil never applies that silently"
         )
     else:
         click.echo(f"  default: {entry.default!r}")
@@ -468,7 +468,7 @@ def _validated(config_path: str, overrides: tuple[str, ...]) -> dict:
 def sum_sectors(config_path: str, overrides: tuple[str, ...]) -> None:
     """Build the aggregate sectors declared in the aggregates block."""
     config = _validated(config_path, overrides)
-    runner = _heavy("dscim_cli.runner")
+    runner = _heavy("dscim_cil.runner")
     for line in runner.sum_sectors(config):
         click.echo(line)
 
@@ -479,7 +479,7 @@ def sum_sectors(config_path: str, overrides: tuple[str, ...]) -> None:
 def reduce(config_path: str, overrides: tuple[str, ...]) -> None:
     """Collapse the batch dimension per the reduce block."""
     config = _validated(config_path, overrides)
-    runner = _heavy("dscim_cli.runner")
+    runner = _heavy("dscim_cil.runner")
     for line in runner.reduce_all(config):
         click.echo(line)
 
@@ -493,7 +493,7 @@ def combine(config_path: str, overrides: tuple[str, ...]) -> None:
     if "combine" not in config:
         click.echo("error: config has no combine block", err=True)
         sys.exit(1)
-    runner = _heavy("dscim_cli.runner")
+    runner = _heavy("dscim_cil.runner")
     for line in runner.combine_all(config):
         click.echo(line)
 
@@ -507,7 +507,7 @@ def scc(config_path: str, overrides: tuple[str, ...]) -> None:
     if "scc" not in config:
         click.echo("error: config has no scc block", err=True)
         sys.exit(1)
-    composer = _heavy("dscim_cli.scc")
+    composer = _heavy("dscim_cil.scc")
     for line in composer.compose(config):
         click.echo(line)
 
@@ -591,7 +591,7 @@ def _rich_plan(steps, root: str) -> None:
                 detail.append("[missing] ", style=ACCENT)
                 detail.append(shown)
             if entry.producer:
-                detail.append(f"  <- dscim-cli {entry.producer}", style="dim")
+                detail.append(f"  <- dscim-cil {entry.producer}", style="dim")
             console.print(detail, no_wrap=True, overflow="ellipsis")
         for path in step.outputs:
             shown = _middle_truncate(_display_path(path, root), path_width)
@@ -621,7 +621,7 @@ def _rich_summary(config: dict, runs) -> None:
             group = Text("  ")
             if producer:
                 group.append("produced by ")
-                group.append(f"dscim-cli {producer} CONFIG", style=ACCENT)
+                group.append(f"dscim-cil {producer} CONFIG", style=ACCENT)
             else:
                 group.append("external: provide these files")
             group.append(f"  ({len(entries)})", style="dim")

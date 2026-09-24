@@ -21,7 +21,7 @@ paths:
   reduced_damages_library: /results/reduced_damages
   results: /results/AR6_ssp
 
-# Aggregate sectors built by `dscim-cli sum-sectors` (dscim sum_AMEL):
+# Aggregate sectors built by `dscim-cil sum-sectors` (dscim sum_AMEL):
 # the named sector sums its members' delta/histclim.
 aggregates:
   AMEL_m0: [agriculture, mortality_v0, energy, labor]
@@ -59,7 +59,7 @@ sectors:
     formula: "damages ~ -1 + gmsl + np.power(gmsl, 2)"
   # Coefficient-only sector: no sector_path/histclim/delta. The presence
   # of damage_function_path makes `run` load coefficients instead of
-  # fitting; it is written by `dscim-cli combine`.
+  # fitting; it is written by `dscim-cil combine`.
   CAMEL_m0_c0.20:
     formula: "damages ~ -1 + anomaly + np.power(anomaly, 2) + gmsl + np.power(gmsl, 2)"
     damage_function_path: /results/AR6_ssp/CAMEL_m0_c0.20/2020/unmasked
@@ -86,13 +86,13 @@ sweep:
     - {recipe: risk_aversion, discounting: euler_ramsey}
     - {recipe: equity, discounting: euler_ramsey}
   eta_rho: [[2.0, 0.0001]]
-  # ECS masking crashes on current xarray (see `dscim-cli explain
+  # ECS masking crashes on current xarray (see `dscim-cil explain
   # ecs_mask_name`); production mask names would go here once fixed
   # upstream, e.g. truncate_at_ecs995symmetric_passing_mask.
   masks: [null]
   fair_dims: [[simulation]]
 
-# Consumed by `dscim-cli reduce`. equity is not listed: it reads
+# Consumed by `dscim-cil reduce`. equity is not listed: it reads
 # the risk_aversion reduced damages.
 reduce:
   reductions: [cc, no_cc]

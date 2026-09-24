@@ -1,5 +1,5 @@
 [project]
-name = "dscim-cli"
+name = "dscim-cil"
 version = "0.1.0"
 description = "Command-line interface to the dscim social cost of carbon library"
 requires-python = ">=3.12"
@@ -13,7 +13,7 @@ run = [
 ]
 
 [project.scripts]
-dscim-cli = "dscim_cli.cli:main"
+dscim-cil = "dscim_cil.cli:main"
 
 [dependency-groups]
 tests = [
@@ -37,7 +37,7 @@ extra-paths = ["tests"]
 [tool.pytest.ini_options]
 markers = [
     "integration: needs dscim and its dependency stack installed",
-    "full_matrix: recipe x discounting cross beyond the default cells; set DSCIM_CLI_FULL_MATRIX=1",
+    "full_matrix: recipe x discounting cross beyond the default cells; set DSCIM_CIL_FULL_MATRIX=1",
 ]
 
 [tool.ruff.lint]
@@ -54,7 +54,7 @@ extend-select = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["dscim_cli"]
+known-first-party = ["dscim_cil"]
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"

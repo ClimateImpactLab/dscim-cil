@@ -9,14 +9,14 @@ import pathlib
 import subprocess
 import sys
 
-PACKAGE = pathlib.Path(__file__).parent.parent / "src" / "dscim_cli"
+PACKAGE = pathlib.Path(__file__).parent.parent / "src" / "dscim_cil"
 
 
 def test_core_modules_do_not_pull_in_click_xarray_or_dscim():
     code = (
         "import sys\n"
-        "import dscim_cli.options\n"
-        "import dscim_cli.config\n"
+        "import dscim_cil.options\n"
+        "import dscim_cil.config\n"
         "forbidden = {'click', 'rich', 'xarray', 'dscim'} & set(sys.modules)\n"
         "assert not forbidden, forbidden\n"
     )
