@@ -1,9 +1,9 @@
 # dscim-cil
 
-[![Tests](https://github.com/C1587S/dscim-cil/actions/workflows/test.yml/badge.svg)](https://github.com/C1587S/dscim-cil/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/C1587S/dscim-cil/graph/badge.svg)](https://codecov.io/gh/C1587S/dscim-cil)
-[![container](https://github.com/C1587S/dscim-cil/actions/workflows/container.yml/badge.svg)](https://github.com/C1587S/dscim-cil/actions/workflows/container.yml)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/C1587S/dscim-cil/HEAD?labpath=examples%2Fdemo.ipynb)
+[![Tests](https://github.com/ClimateImpactLab/dscim-cil/actions/workflows/test.yml/badge.svg)](https://github.com/ClimateImpactLab/dscim-cil/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/ClimateImpactLab/dscim-cil/graph/badge.svg)](https://codecov.io/gh/ClimateImpactLab/dscim-cil)
+[![container](https://github.com/ClimateImpactLab/dscim-cil/actions/workflows/container.yml/badge.svg)](https://github.com/ClimateImpactLab/dscim-cil/actions/workflows/container.yml)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ClimateImpactLab/dscim-cil/HEAD?labpath=examples%2Fdemo.ipynb)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue)](pyproject.toml)
 
 A command-line interface to [dscim](https://github.com/ClimateImpactLab/dscim),
