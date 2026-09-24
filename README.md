@@ -96,12 +96,12 @@ dscim-cil targets dscim `main`, pinned to the commit in the `run` extra.
 
 ## Container
 
-Published to ghcr on every push to main (`edge`) and on version tags:
+Published to ghcr on every push to master (`edge`) and on version tags:
 
 ```shell
-docker pull ghcr.io/c1587s/dscim-cil:edge
+docker pull ghcr.io/climateimpactlab/dscim-cil:edge
 docker run --rm -v ./conf:/mnt/conf:ro -v ./data:/mnt/data \
-    ghcr.io/c1587s/dscim-cil:edge run /mnt/conf/config.yml
+    ghcr.io/climateimpactlab/dscim-cil:edge run /mnt/conf/config.yml
 ```
 
 Or build locally:
