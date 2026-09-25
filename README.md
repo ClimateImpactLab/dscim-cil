@@ -52,7 +52,7 @@ from [examples/minimal.yaml](examples/minimal.yaml).
 
 ## Container
 
-Published to ghcr on every push to master (`edge`) and on version tags:
+Published to ghcr on every push to main (`edge`) and on version tags:
 
 ```shell
 docker pull ghcr.io/climateimpactlab/dscim-cil:edge

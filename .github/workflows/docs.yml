@@ -4,7 +4,7 @@ name: Documentation
 # every push, add under `on:`:
 #   push:
 #     branches:
-#       - master
+#       - main
 # GitHub Pages must also be set to deploy from GitHub Actions in the
 # repository settings.
 on:
