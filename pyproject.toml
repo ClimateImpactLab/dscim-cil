@@ -23,7 +23,8 @@ tests = [
  "ruff>=0.8",
  "ty>=0.0.35",
 ]
-dev = [{ include-group = "tests" }]
+docs = ["zensical>=0.0.41"]
+dev = [{ include-group = "tests" }, { include-group = "docs" }]
 
 [build-system]
 requires = ["uv_build>=0.11.13,<0.13.0"]

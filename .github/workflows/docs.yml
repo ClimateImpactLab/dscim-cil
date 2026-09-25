@@ -1,0 +1,52 @@
+name: Documentation
+
+# Manual trigger only until the site has been reviewed. To publish on
+# every push, add under `on:`:
+#   push:
+#     branches:
+#       - master
+# GitHub Pages must also be set to deploy from GitHub Actions in the
+# repository settings.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - run: uv sync --locked --group docs
+
+      - run: uv run --group docs python scripts/generate_options_page.py
+
+      - run: uv run --group docs zensical build --clean
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+      - uses: actions/deploy-pages@v5
+        id: deployment

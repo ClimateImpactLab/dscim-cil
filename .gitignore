@@ -24,3 +24,7 @@ examples/coverage_data/
 
 # Local real-data runs
 local/
+
+# Docs: options.md is generated from the catalogue at build time
+docs/options.md
+site/
