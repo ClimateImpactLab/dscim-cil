@@ -83,8 +83,10 @@ below uses paths relative to it, so run the commands from there.
 
 ### 1. One scenario with flags
 
-A config without a `sweep` block holds the inputs; the flags choose what
-to compute. Save the config:
+A config file is always required: the flags replace the `sweep` block,
+not the config, and the data paths, the `sectors` block and the `menu`
+options always live in the file. A config without a `sweep` block holds
+the inputs, and the flags choose what to compute. Save the config:
 
 ```shell
 cat > scenario.yml <<'EOF'
@@ -391,8 +393,9 @@ Usage: dscim-cil run [OPTIONS] CONFIG_PATH
 
   Expand the sweep and execute menu runs.
 
-  Selector flags narrow the config's sweep; a config without a sweep block can
-  be driven entirely by flags.
+  Selector flags narrow the config's sweep. In a config without a sweep block
+  they supply the sweep axes; the config file is still required for the data
+  paths, sectors and menu options.
 
 Options:
   -c, --conf KEY=VALUE

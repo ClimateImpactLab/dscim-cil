@@ -188,7 +188,9 @@ completed: labor 2020 adding_up/euler_ramsey eta=2.0 rho=0.0001 (metadata: /work
 ```
 
 `--resume` skips runs whose outputs already exist; `--recipe` and
-`--discounting` narrow the sweep from the command line.
+`--discounting` narrow the sweep from the command line. The flags
+replace the sweep block, not the config: data paths, sectors and menu
+options always live in the config file.
 
 ## sum-sectors
 

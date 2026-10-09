@@ -212,8 +212,9 @@ def run(
 ) -> None:
     """Expand the sweep and execute menu runs.
 
-    Selector flags narrow the config's sweep; a config without a sweep
-    block can be driven entirely by flags.
+    Selector flags narrow the config's sweep. In a config without a
+    sweep block they supply the sweep axes; the config file is still
+    required for the data paths, sectors and menu options.
     """
     try:
         config, sources = _load(

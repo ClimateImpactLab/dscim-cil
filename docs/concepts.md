@@ -37,7 +37,9 @@ Sweep axes
 Selector flags
 :   `--sector`, `--pulse-year`, `--recipe`, `--discounting`, `--mask`,
     `--eta` and `--rho` narrow the sweep of a config, or define the axes
-    of a config that has no sweep block.
+    of a config that has no sweep block. They replace the sweep block,
+    not the config: data paths, sectors and menu options always live in
+    the config file.
 
 ## Recipes
 
