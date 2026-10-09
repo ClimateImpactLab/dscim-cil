@@ -404,8 +404,10 @@ def execute(
 ) -> list[str]:
     """Execute runs and write metadata beside their outputs.
 
-    With ``resume``, runs whose declared outputs all exist are skipped.
-    Returns one status line per run.
+    Preflights every run first, then builds each recipe from
+    ``build_kwargs`` and calls its ``order_plate`` with the config's
+    ``order`` (default ``scc``). With ``resume``, runs whose declared
+    outputs all exist are skipped. Returns one status line per run.
     """
     if runs is None:
         runs = expand_sweep(config)
@@ -455,7 +457,14 @@ def _config_file(config: dict) -> str:
 
 
 def sum_sectors(config: dict) -> list[str]:
-    """Build every aggregate sector declared in the aggregates block."""
+    """Build every aggregate sector declared in the aggregates block.
+
+    ``sum_AMEL`` re-reads the config file itself and writes
+    ``summed_delta`` and ``summed_histclim`` to the aggregate's
+    ``sector_path`` (preprocessing.py:216-282). It rechunks to fixed
+    production dimensions (batch, ssp, model, rcp, gcm, year, region),
+    so a sector with other dimensions fails inside dscim.
+    """
     from dscim.preprocessing.preprocessing import sum_AMEL
 
     aggregates = config.get("aggregates") or {}
@@ -475,6 +484,9 @@ def reduce_all(config: dict) -> list[str]:
 
     adding_up takes ``eta=None`` (dscim asserts it,
     preprocessing.py:85-88); risk_aversion runs once per swept eta.
+    ``reduce_damages`` reads a precomputed ``gdppc`` variable from the
+    socioeconomics file (preprocessing.py:30-36), which the menu runs do
+    not need, and re-reads the config file from disk.
     """
     from dscim.preprocessing.preprocessing import reduce_damages
 
@@ -527,9 +539,10 @@ def reduce_all(config: dict) -> list[str]:
 def combine_all(config: dict) -> list[str]:
     """Merge coastal and AMEL coefficients per the combine block.
 
-    dscim never merges the fitted-values files: combine_CAMEL_coefs
-    rebinds its ``fit`` parameter before testing it
-    (midprocessing.py), so only coefficients are combined.
+    Writes to ``{results}/{target}/{pulse_year}/{mask}/``. dscim never
+    merges the fitted-values files: combine_CAMEL_coefs rebinds its
+    ``fit`` parameter before testing it (midprocessing.py:23,50), so only
+    coefficients are combined.
     """
     from dscim.preprocessing.midprocessing import combine_CAMEL_coefs
 

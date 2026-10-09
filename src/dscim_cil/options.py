@@ -225,7 +225,7 @@ class Combination:
     kind :
         ``"requires"`` or ``"forbidden"``.
     description :
-        The rule as one sentence; rendered by ``dscim-cil compat``.
+        The rule as one sentence; rendered by ``dscim-cil constraints``.
     citation :
         Source backing the rule.
     modes :

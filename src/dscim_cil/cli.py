@@ -477,7 +477,12 @@ def sum_sectors(config_path: str, overrides: tuple[str, ...]) -> None:
 @click.argument("config_path", type=click.Path())
 @click.option("-c", "--conf", "overrides", multiple=True, metavar="KEY=VALUE")
 def reduce(config_path: str, overrides: tuple[str, ...]) -> None:
-    """Collapse the batch dimension per the reduce block."""
+    """Collapse the batch dimension per the reduce block.
+
+    adding_up takes the mean over batch; risk_aversion takes the
+    certainty equivalent at each swept eta. The econ file must carry a
+    precomputed gdppc variable.
+    """
     config = _validated(config_path, overrides)
     runner = _heavy("dscim_cil.runner")
     for line in runner.reduce_all(config):
@@ -502,7 +507,11 @@ def combine(config_path: str, overrides: tuple[str, ...]) -> None:
 @click.argument("config_path", type=click.Path())
 @click.option("-c", "--conf", "overrides", multiple=True, metavar="KEY=VALUE")
 def scc(config_path: str, overrides: tuple[str, ...]) -> None:
-    """Compose SCCs from the uncollapsed run outputs per the scc block."""
+    """Compose SCCs from the uncollapsed run outputs per the scc block.
+
+    Reads the uncollapsed marginal damages and discount factors that
+    ``run`` wrote, so both must be in ``menu.save_files``.
+    """
     config = _validated(config_path, overrides)
     if "scc" not in config:
         click.echo("error: config has no scc block", err=True)

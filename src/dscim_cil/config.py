@@ -114,7 +114,8 @@ class ConfigError(Exception):
 class Run:
     """One fully-resolved element of the sweep.
 
-    ``mask`` and ``fair_dims`` apply in ssp mode only.
+    ``eta`` and ``rho`` are one pair from ``sweep.eta_rho``. ``mask`` and
+    ``fair_dims`` apply in ssp mode only.
     """
 
     sector: str
@@ -911,8 +912,10 @@ def _validate_scc(config: dict, errors: list[str]) -> None:
 
 
 def resolved_config(config: dict) -> dict:
-    """Fill non-scientific defaults.
+    """Return a copy of the config with dscim's defaults filled in.
 
+    Fills the menu keys and the climate keys gases, base_period, and
+    emission_scenarios where the config omits them, and ``order``.
     Options marked ``config_required`` are never filled.
     """
     result = _deep_copy(config)
@@ -940,7 +943,9 @@ def resolved_config(config: dict) -> dict:
 def expand_sweep(config: dict) -> list[Run]:
     """Expand the ``sweep:`` block into concrete runs.
 
-    The axes mirror ``run_ssps``'s product (utils/menu_runs.py:44-46);
+    The axes mirror ``run_ssps``'s product (utils/menu_runs.py:44-46):
+    sector, pulse year, menu pair, eta and rho pair, mask, fair_dims.
+    ``menu_pairs`` and ``eta_rho`` hold pairs, not independent axes.
     rff mode has no masks or fair_dims axes.
     """
     sweep = config["sweep"]
@@ -991,6 +996,10 @@ def save_path_for(config: dict, run: Run) -> str:
 
 
 def _coefficient_file(directory: str, run: Run) -> str:
+    """The coefficient file name dscim reads (main_recipe.py:729).
+
+    Eta and rho appear at full precision.
+    """
     stem = (
         f"{run.recipe}_{run.discounting}_eta{run.eta}_rho{run.rho}"
         f"_damage_function_coefficients.nc4"
@@ -999,7 +1008,12 @@ def _coefficient_file(directory: str, run: Run) -> str:
 
 
 def epa_coefficient_file(directory: str, run: Run) -> str:
-    """The EPA library's name for the same file (scghg_utils.py:257-270)."""
+    """The EPA library's name for the same coefficient file.
+
+    dscim-facts-epa rounds eta and rho to three places and ends the name
+    in ``_dfc.nc4`` (scghg_utils.py:257-270). dscim main does not read
+    this name; see ``_coefficient_file``.
+    """
     stem = (
         f"{run.recipe}_{run.discounting}"
         f"_eta{round(run.eta, 3)}_rho{round(run.rho, 3)}_dfc.nc4"
@@ -1084,7 +1098,9 @@ def run_inputs(config: dict, run: Run) -> list[Input]:
 def run_outputs(config: dict, run: Run) -> list[str]:
     """List a run's output files.
 
-    Names follow dscim's save decorator (decorators.py:33);
+    Names follow dscim's save decorator (decorators.py:33):
+    ``{recipe}_{discounting}_eta{eta}_rho{rho}_{artifact}`` under the
+    run's save path, one per entry of ``menu.save_files``.
     damage_function_points is a csv, everything else nc4.
     """
     save_files = _menu(config).get("save_files", list(DEFAULT_SAVE_FILES))
@@ -1288,7 +1304,11 @@ def summary_data(config: dict, runs: list[Run]) -> dict:
 
 
 def render_summary(config: dict, runs: list[Run]) -> str:
-    """Render the summary dry-run report."""
+    """Render the dry-run summary as text.
+
+    Gives the mode, the run count with axis sizes, missing inputs grouped
+    by the command that produces them, output totals, and blocked runs.
+    """
     data = summary_data(config, runs)
     lines = [
         f"mode: {data['mode']}",
@@ -1319,7 +1339,12 @@ def render_summary(config: dict, runs: list[Run]) -> str:
 def render_plan(
     config: dict, runs: list[Run], *, indices: list[int] | None = None
 ) -> str:
-    """Render per-run dry-run detail; ``indices`` are 1-based."""
+    """Render per-run dry-run detail as text.
+
+    Each run lists its settings, its input files marked ok or missing
+    (with the producing command), and its output files marked exists or
+    new. ``indices`` are 1-based; None shows every run.
+    """
     lines = [f"mode: {config['mode']}", f"runs: {len(runs)}", ""]
     for index, run in enumerate(runs, start=1):
         if indices is not None and index not in indices:

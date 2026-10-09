@@ -17,6 +17,11 @@ __all__ = ["compose"]
 
 
 def _only_var(dataset: xr.Dataset) -> xr.DataArray:
+    """The dataset's single data variable.
+
+    dscim's save decorator names the variable of a saved array after the
+    artifact (decorators.py:37).
+    """
     names = list(dataset.data_vars)
     return dataset[names[0]]
 
@@ -37,9 +42,13 @@ def _collapse_dim(data: xr.DataArray) -> str | None:
 def compose(config: dict, runs: list[Run] | None = None) -> list[str]:
     """Compose, deflate, and collapse SCCs for every run.
 
-    Returns one status line per run, naming the file written. Raises
-    FileNotFoundError when a run output is missing and ValueError when
-    the collapse cannot be applied to the data.
+    Each SCC is the sum over years of uncollapsed marginal damages times
+    uncollapsed discount factors, multiplied by ``scc.deflator``, then
+    collapsed per ``scc.collapse`` (``mean``, ``certainty_equivalent``,
+    or ``none``). Writes ``{recipe}_{discounting}_eta{eta}_rho{rho}_scghg.nc4``
+    under ``scc.output``. Returns one status line per run, naming the file
+    written. Raises FileNotFoundError when a run output is missing and
+    ValueError when the collapse cannot be applied to the data.
     """
     scc_config = config["scc"]
     if runs is None:
