@@ -1205,27 +1205,30 @@ def plan_steps(config: dict) -> list[PlanStep]:
     combine = config.get("combine")
     if combine and config["mode"] == "ssp":
         target = combine["target"]
-        directory = sectors.get(target, {}).get("damage_function_path", "")
-        pairs = {(r.recipe, r.discounting, r.eta, r.rho) for r in runs}
+        results = config["paths"]["results"]
+        sweep = config["sweep"]
         inputs = []
         outputs = []
-        for recipe, discounting, eta, rho in sorted(pairs):
+        for pair, (eta, rho), pulse_year, mask in itertools.product(
+            sweep["menu_pairs"],
+            sweep["eta_rho"],
+            sweep["pulse_years"],
+            sweep.get("masks", [None]),
+        ):
             stem = (
-                f"{recipe}_{discounting}_eta{eta}_rho{rho}"
+                f"{pair['recipe']}_{pair['discounting']}_eta{eta}_rho{rho}"
                 f"_damage_function_coefficients.nc4"
             )
+            leaf = (str(pulse_year), mask or "unmasked", stem)
             for role in ("coastal", "amel"):
-                source = combine[role]
                 inputs.append(
                     Input(
-                        os.path.join(
-                            config["paths"]["results"], source, "2020", "unmasked", stem
-                        ),
+                        os.path.join(results, combine[role], *leaf),
                         f"{role} coefficients",
                         "run",
                     )
                 )
-            outputs.append(os.path.join(directory, stem))
+            outputs.append(os.path.join(results, target, *leaf))
         steps.append(
             PlanStep(
                 name="combine",

@@ -429,6 +429,35 @@ def test_plan_steps_order_and_producers():
     assert all("blocked-by-" in s.status() for s in steps)
 
 
+def test_combine_step_uses_swept_pulse_years_and_masks():
+    config = ssp_config()
+    config["sectors"]["CAMEL_x"] = {
+        "formula": (
+            "damages ~ -1 + anomaly + np.power(anomaly, 2) + gmsl + np.power(gmsl, 2)"
+        ),
+        "damage_function_path": "/r/results/CAMEL_x/2030/unmasked",
+    }
+    config["sweep"]["sectors"].append("CAMEL_x")
+    config["sweep"]["pulse_years"] = [2030, 2040]
+    config["sweep"]["masks"] = [None, "mask_a"]
+    config["combine"] = {
+        "target": "CAMEL_x",
+        "coastal": "coastal_v0.20",
+        "amel": "AMEL_m0",
+    }
+    combine_step = next(s for s in plan_steps(config) if s.name == "combine")
+    results = config["paths"]["results"]
+    stem = "adding_up_euler_ramsey_eta2.0_rho0.0001_damage_function_coefficients.nc4"
+    for year in (2030, 2040):
+        for mask in ("unmasked", "mask_a"):
+            assert f"{results}/CAMEL_x/{year}/{mask}/{stem}" in combine_step.outputs
+            for source in ("coastal_v0.20", "AMEL_m0"):
+                path = f"{results}/{source}/{year}/{mask}/{stem}"
+                assert path in [i.path for i in combine_step.inputs]
+    assert not any("/2020/" in i.path for i in combine_step.inputs)
+    assert not any("/2020/" in path for path in combine_step.outputs)
+
+
 def test_combine_block_validation():
     config = ssp_config()
     config["combine"] = {
