@@ -6,7 +6,7 @@ environment variables. `--plain` switches off the rich rendering;
 `--log-level` controls logging. All output below is real: the
 catalogue commands need no data, and the pipeline commands were run on
 the small generated fixtures from
-[examples/demo.ipynb](https://github.com/ClimateImpactLab/dscim-cil/blob/master/examples/demo.ipynb),
+[examples/demo.ipynb](https://github.com/ClimateImpactLab/dscim-cil/blob/main/examples/demo.ipynb),
 with paths shortened to `/work`.
 
 ## stages

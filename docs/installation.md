@@ -21,7 +21,7 @@ in its `*_run_metadata.yaml`.
 
 ## Container
 
-Published to ghcr on every push to master (`edge`) and on version
+Published to ghcr on every push to main (`edge`) and on version
 tags:
 
 ```shell

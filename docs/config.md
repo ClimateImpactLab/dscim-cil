@@ -3,10 +3,10 @@
 One YAML schema covers both run modes; `mode: ssp | rff` is required
 and every cross-field rule is checked against it. The full annotated
 examples below are
-[examples/ssp.yaml](https://github.com/ClimateImpactLab/dscim-cil/blob/master/examples/ssp.yaml)
+[examples/ssp.yaml](https://github.com/ClimateImpactLab/dscim-cil/blob/main/examples/ssp.yaml)
 and
-[examples/rff.yaml](https://github.com/ClimateImpactLab/dscim-cil/blob/master/examples/rff.yaml);
-[examples/minimal.yaml](https://github.com/ClimateImpactLab/dscim-cil/blob/master/examples/minimal.yaml)
+[examples/rff.yaml](https://github.com/ClimateImpactLab/dscim-cil/blob/main/examples/rff.yaml);
+[examples/minimal.yaml](https://github.com/ClimateImpactLab/dscim-cil/blob/main/examples/minimal.yaml)
 is the smallest useful starting point.
 
 ## Precedence

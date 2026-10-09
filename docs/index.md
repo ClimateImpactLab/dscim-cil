@@ -22,6 +22,7 @@ source citation; see the [options reference](options.md).
 
 - [Concepts](concepts.md): the vocabulary, in short definitions.
 - [Installation](installation.md): the `run` extra and the container.
+- [Examples](examples.md): one scenario with flags, as a config file, as a sweep, and with Docker.
 - [Commands](commands.md): every command with its real output.
 - [The config file](config.md): the schema, both modes, and sweeps.
 - [The pipeline](pipeline.md): the stages and what each collapses.
@@ -39,9 +40,9 @@ dscim-cil constraints                 # cross-option validity rules
 dscim-cil defaults                    # dscim's defaults and what you must set
 ```
 
-[examples/demo.ipynb](https://github.com/ClimateImpactLab/dscim-cil/blob/master/examples/demo.ipynb)
+[examples/demo.ipynb](https://github.com/ClimateImpactLab/dscim-cil/blob/main/examples/demo.ipynb)
 runs a walkthrough on generated fixtures, and
-[examples/coverage.ipynb](https://github.com/ClimateImpactLab/dscim-cil/blob/master/examples/coverage.ipynb)
+[examples/coverage.ipynb](https://github.com/ClimateImpactLab/dscim-cil/blob/main/examples/coverage.ipynb)
 exercises the supported option surface.
 
 ## dscim versions

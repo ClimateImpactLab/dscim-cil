@@ -172,8 +172,11 @@ def write_gmst_csv(path) -> str:
     return target
 
 
-def write_fair(path) -> str:
-    """Write the FaIR temperature file (control/pulse, simulation dim)."""
+def write_fair(path, *, pulse_years: tuple[int, ...] = (PULSE_YEAR,)) -> str:
+    """Write the FaIR temperature file (control/pulse, simulation dim).
+
+    The pulse run carries one entry per year in ``pulse_years``.
+    """
     simulations = [0, 1]
     ramp = 1.0 + 2.0 * (FAIR_YEARS - 2001) / 300.0
     control = np.stack(
@@ -187,13 +190,15 @@ def write_fair(path) -> str:
     )
     # The pulse starts at the pulse year; a constant offset over all
     # years would be removed exactly by the base-period rebasing.
-    pulse = control + 0.01 * (FAIR_YEARS >= PULSE_YEAR)
+    pulse = np.stack(
+        [control + 0.01 * (year <= FAIR_YEARS) for year in pulse_years], axis=-1
+    )
     ds = xr.Dataset(
         {
             "control_temperature": (("rcp", "simulation", "gas", "year"), control),
             "pulse_temperature": (
                 ("rcp", "simulation", "gas", "year", "pulse_year"),
-                pulse[..., None],
+                pulse,
             ),
             "medianparams_control_temperature": (
                 ("rcp", "gas", "year"),
@@ -201,7 +206,7 @@ def write_fair(path) -> str:
             ),
             "medianparams_pulse_temperature": (
                 ("rcp", "gas", "year", "pulse_year"),
-                pulse[:, 0, :, :, None],
+                pulse[:, 0, :, :, :],
             ),
         },
         coords={
@@ -209,7 +214,7 @@ def write_fair(path) -> str:
             "simulation": simulations,
             "gas": GASES,
             "year": FAIR_YEARS,
-            "pulse_year": [PULSE_YEAR],
+            "pulse_year": list(pulse_years),
         },
     )
     target = str(path / "fair.nc")
@@ -317,7 +322,12 @@ def write_rff_coefficients(
     return str(directory)
 
 
-def ssp_fixture_config(path, *, etas: tuple[float, ...] = (2.0,)) -> dict:
+def ssp_fixture_config(
+    path,
+    *,
+    etas: tuple[float, ...] = (2.0,),
+    pulse_years: tuple[int, ...] = (PULSE_YEAR,),
+) -> dict:
     """Build a complete, runnable ssp-mode config over tiny fixtures.
 
     Parameters
@@ -326,6 +336,8 @@ def ssp_fixture_config(path, *, etas: tuple[float, ...] = (2.0,)) -> dict:
         Directory (pathlib.Path) to populate.
     etas :
         Etas for which risk_aversion CE zarrs are written.
+    pulse_years :
+        Pulse years the FaIR file carries.
 
     Returns
     -------
@@ -335,7 +347,7 @@ def ssp_fixture_config(path, *, etas: tuple[float, ...] = (2.0,)) -> dict:
     econ = write_econ(path)
     library = write_ce_zarrs(path, etas=etas)
     gmst = write_gmst_csv(path)
-    fair = write_fair(path)
+    fair = write_fair(path, pulse_years=pulse_years)
     conversion = write_conversion(path)
     results = path / "results"
     return {

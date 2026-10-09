@@ -1,6 +1,6 @@
 # Reproducing the EPA numbers
 
-[applications/epa-scc](https://github.com/ClimateImpactLab/dscim-cil/tree/master/applications/epa-scc)
+[applications/epa-scc](https://github.com/ClimateImpactLab/dscim-cil/tree/main/applications/epa-scc)
 computes the social cost of CO2 from the EPA/RFF pipeline: sector
 CAMEL_m1_c0.20 (the combined agriculture, coastal, energy, labor, and
 mortality estimate, global scope) with the risk_aversion recipe and

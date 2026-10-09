@@ -52,25 +52,94 @@ from [examples/minimal.yaml](examples/minimal.yaml).
 
 ## Examples
 
-The outputs below come from the small generated inputs the demo
-notebook uses, with the data directory shown as `/work`.
+<!-- --8<-- [start:examples] -->
+The examples run on the small inputs the test suite generates, so
+nothing needs downloading. Each example below can be pasted as it is.
 
-### One scenario with flags
+### Setup
 
-A config without a `sweep` block can be driven entirely by flags. The
-config holds the inputs; the flags choose what to compute:
+From a checkout of this repository, with dscim-cil installed with the
+`run` extra, generate the inputs and move into their directory:
 
 ```shell
-dscim-cil run scenario.yml --sector labor --pulse-year 2020 \
-    --recipe adding_up --discounting euler_ramsey --eta 2.0 --rho 0.0001
+mkdir -p example-data
+python -W ignore - <<'EOF'
+import pathlib
+import sys
+
+sys.path.insert(0, "tests")
+import fixture_factory
+
+fixture_factory.ssp_fixture_config(
+    pathlib.Path("example-data"), pulse_years=(2020, 2030)
+)
+EOF
+cd example-data
 ```
 
-Add `--dry-run` first to see the settings and where each value came
-from, without computing anything:
+The directory now holds `econ.zarr`, `fair.nc`, `gmst.csv`,
+`conversion.nc`, and the reduced damages in `reduced/`. Every config
+below uses paths relative to it, so run the commands from there.
+
+### 1. One scenario with flags
+
+A config without a `sweep` block holds the inputs; the flags choose what
+to compute. Save the config:
+
+```shell
+cat > scenario.yml <<'EOF'
+mode: ssp
+
+climate:
+  gases: [CO2_Fossil]
+  gmst_path: gmst.csv
+  gmsl_path: ""
+  gmst_fair_path: fair.nc
+  damages_pulse_conversion_path: conversion.nc
+  emission_scenarios: [rcp45, rcp85]
+
+econ:
+  path: econ.zarr
+
+paths:
+  reduced_damages_library: reduced
+  results: results
+
+sectors:
+  labor:
+    sector_path: labor_damages.zarr
+    histclim: histclim
+    delta: delta
+    formula: "damages ~ -1 + anomaly + np.power(anomaly, 2)"
+
+menu:
+  fair_aggregation: [ce, mean]
+  weitzman_parameter: [0.1]
+  subset_dict: {ssp: [SSP2, SSP3]}
+  save_files:
+    - scc
+    - uncollapsed_sccs
+    - uncollapsed_marginal_damages
+    - uncollapsed_discount_factors
+EOF
+```
+
+See what the flags expand to without computing anything. `--dry-run`
+checks the config and the flags together; `validate` needs a `sweep`
+block, so it is used from example 2 on:
+
+```shell
+dscim-cil run scenario.yml \
+    --sector labor \
+    --pulse-year 2020 \
+    --recipe adding_up \
+    --discounting euler_ramsey \
+    --eta 2.0 \
+    --rho 0.0001 \
+    --dry-run
+```
 
 ```console
-$ dscim-cil run scenario.yml --sector labor --pulse-year 2020 \
-    --recipe adding_up --discounting euler_ramsey --eta 2.0 --rho 0.0001 --dry-run
 settings:
   discounting_type           euler_ramsey                           (flag)
   discrete_discounting       False                                  (default)
@@ -87,51 +156,41 @@ settings:
 mode: ssp
 runs: 1  (1 sectors x 1 pulse_years x 1 menu pairs x 1 eta_rho x 1 masks x 1 fair_dims)
 missing inputs: none
-outputs: 2 files, 0 already exist
+outputs: 4 files, 0 already exist
 blocked runs: 0 of 1 (missing inputs)
 use --verbose or --runs N[,N...] for per-run detail
 ```
 
-The real run ends with one line per run:
+Each run takes one sector, one pulse year, one recipe, one discounting
+type, and one eta and rho pair. This one finishes in about 7 seconds on
+the example inputs. Drop `--dry-run` to run it:
 
-```console
-completed: labor 2020 adding_up/euler_ramsey eta=2.0 rho=0.0001 (metadata: /work/results/labor/2020/unmasked/adding_up_euler_ramsey_eta2.0_rho0.0001_run_metadata.yaml)
+```shell
+dscim-cil run scenario.yml \
+    --sector labor \
+    --pulse-year 2020 \
+    --recipe adding_up \
+    --discounting euler_ramsey \
+    --eta 2.0 \
+    --rho 0.0001
 ```
 
-### The same scenario as a config file
+dscim's own progress lines print first; the last line is
 
-The flags above are the `sweep` block of a config:
+```console
+completed: labor 2020 adding_up/euler_ramsey eta=2.0 rho=0.0001 (metadata: results/labor/2020/unmasked/adding_up_euler_ramsey_eta2.0_rho0.0001_run_metadata.yaml)
+```
 
-```yaml
-mode: ssp
+and `results/labor/2020/unmasked` holds the run's four outputs and its
+`run_metadata.yaml`.
 
-climate:
-  gases: [CO2_Fossil]
-  gmst_path: /work/gmst.csv
-  gmsl_path: ""
-  gmst_fair_path: /work/fair.nc
-  damages_pulse_conversion_path: /work/conversion.nc
-  emission_scenarios: [rcp45, rcp85]
+### 2. The same scenario as a config file
 
-econ:
-  path: /work/econ.zarr
+The flags above become a `sweep` block appended to the same config:
 
-paths:
-  reduced_damages_library: /work/reduced
-  results: /work/results
-
-sectors:
-  labor:
-    sector_path: /work/labor_damages.zarr
-    histclim: histclim
-    delta: delta
-    formula: "damages ~ -1 + anomaly + np.power(anomaly, 2)"
-
-menu:
-  fair_aggregation: [ce, mean]
-  weitzman_parameter: [0.1]
-  subset_dict: {ssp: [SSP2, SSP3]}
-  save_files: [scc, uncollapsed_sccs]
+```shell
+cp scenario.yml config.yml
+cat >> config.yml <<'EOF'
 
 sweep:
   sectors: [labor]
@@ -139,49 +198,224 @@ sweep:
   menu_pairs:
     - {recipe: adding_up, discounting: euler_ramsey}
   eta_rho: [[2.0, 0.0001]]
+EOF
+```
+
+```shell
+dscim-cil validate config.yml
+dscim-cil run config.yml
 ```
 
 ```console
-$ dscim-cil validate config.yml
 config is valid
-$ dscim-cil run config.yml
 ...
-completed: labor 2020 adding_up/euler_ramsey eta=2.0 rho=0.0001 (metadata: /work/results/labor/2020/unmasked/adding_up_euler_ramsey_eta2.0_rho0.0001_run_metadata.yaml)
+completed: labor 2020 adding_up/euler_ramsey eta=2.0 rho=0.0001 (metadata: results/labor/2020/unmasked/adding_up_euler_ramsey_eta2.0_rho0.0001_run_metadata.yaml)
 ```
 
-The run writes three files to `/work/results/labor/2020/unmasked`: the
-SCC, the uncollapsed SCCs, and a `run_metadata.yaml` recording the
-settings, where each came from, and the dscim version. Flags narrow a
-config that has a sweep: `--pulse-year 2030` on a config sweeping
-several years keeps only 2030.
+The result is the same run. With a `sweep` block, flags narrow it:
+`--pulse-year 2030` on a config that sweeps several years keeps only
+2030.
+
+### 3. A sweep
+
+The same config with two pulse years and EPA's three discount-rate
+calibrations (1.5%, 2.0%, and 2.5% Ramsey) runs six combinations. The
+`scc` block says how to compose SCCs from the outputs. Replace the
+`sweep` block and add it:
+
+```shell
+cp scenario.yml sweep.yml
+cat >> sweep.yml <<'EOF'
+
+sweep:
+  sectors: [labor]
+  pulse_years: [2020, 2030]
+  menu_pairs:
+    - {recipe: adding_up, discounting: euler_ramsey}
+  eta_rho:
+    - [1.016010255, 9.149608e-05]
+    - [1.244459066, 0.00197263997]
+    - [1.421158116, 0.00461878399]
+
+scc:
+  deflator: 1.0
+  collapse: mean
+  output: scghgs
+EOF
+```
+
+The dry run shows how many runs the sweep expands to:
+
+```shell
+dscim-cil validate sweep.yml
+dscim-cil run sweep.yml --dry-run
+```
+
+```console
+config is valid
+settings:
+  discounting_type           euler_ramsey                           (config)
+  discrete_discounting       False                                  (default)
+  eta                        [1.016010255, 1.244459066, 1.421158116] (config)
+  ext_method                 global_c_ratio                         (default)
+  fair_aggregation           ['ce', 'mean']                         (config)
+  fit_type                   ols                                    (default)
+  gases                      ['CO2_Fossil']                         (config)
+  pulse_year                 [2020, 2030]                           (config)
+  recipe                     adding_up                              (config)
+  rho                        [9.149608e-05, 0.00197263997, 0.00461878399] (config)
+  sector                     labor                                  (config)
+  weitzman_parameter         [0.1]                                  (config)
+mode: ssp
+runs: 6  (1 sectors x 2 pulse_years x 1 menu pairs x 3 eta_rho x 1 masks x 1 fair_dims)
+missing inputs: none
+outputs: 24 files, 0 already exist
+blocked runs: 0 of 6 (missing inputs)
+use --verbose or --runs N[,N...] for per-run detail
+```
+
+Run the sweep, then compose the SCCs. The six runs take about 40
+seconds here and `scc` about 2:
+
+```shell
+dscim-cil run sweep.yml
+dscim-cil scc sweep.yml
+```
+
+`run` prints dscim's progress for each run and ends with one line per
+run:
+
+```console
+completed: labor 2020 adding_up/euler_ramsey eta=1.016010255 rho=9.149608e-05 (metadata: results/labor/2020/unmasked/adding_up_euler_ramsey_eta1.016010255_rho9.149608e-05_run_metadata.yaml)
+completed: labor 2020 adding_up/euler_ramsey eta=1.244459066 rho=0.00197263997 (metadata: results/labor/2020/unmasked/adding_up_euler_ramsey_eta1.244459066_rho0.00197263997_run_metadata.yaml)
+completed: labor 2020 adding_up/euler_ramsey eta=1.421158116 rho=0.00461878399 (metadata: results/labor/2020/unmasked/adding_up_euler_ramsey_eta1.421158116_rho0.00461878399_run_metadata.yaml)
+completed: labor 2030 adding_up/euler_ramsey eta=1.016010255 rho=9.149608e-05 (metadata: results/labor/2030/unmasked/adding_up_euler_ramsey_eta1.016010255_rho9.149608e-05_run_metadata.yaml)
+completed: labor 2030 adding_up/euler_ramsey eta=1.244459066 rho=0.00197263997 (metadata: results/labor/2030/unmasked/adding_up_euler_ramsey_eta1.244459066_rho0.00197263997_run_metadata.yaml)
+completed: labor 2030 adding_up/euler_ramsey eta=1.421158116 rho=0.00461878399 (metadata: results/labor/2030/unmasked/adding_up_euler_ramsey_eta1.421158116_rho0.00461878399_run_metadata.yaml)
+```
+
+`scc` sums marginal damages times discount factors over the years for
+each run, applies the deflator (1.0 here, no price-year conversion), and
+averages over the simulations:
+
+```console
+completed: scghgs/labor/2020/unmasked/adding_up_euler_ramsey_eta1.016010255_rho9.149608e-05_scghg.nc4
+completed: scghgs/labor/2020/unmasked/adding_up_euler_ramsey_eta1.244459066_rho0.00197263997_scghg.nc4
+completed: scghgs/labor/2020/unmasked/adding_up_euler_ramsey_eta1.421158116_rho0.00461878399_scghg.nc4
+completed: scghgs/labor/2030/unmasked/adding_up_euler_ramsey_eta1.016010255_rho9.149608e-05_scghg.nc4
+completed: scghgs/labor/2030/unmasked/adding_up_euler_ramsey_eta1.244459066_rho0.00197263997_scghg.nc4
+completed: scghgs/labor/2030/unmasked/adding_up_euler_ramsey_eta1.421158116_rho0.00461878399_scghg.nc4
+```
 
 ### Running with Docker
 
-The image is published to ghcr on every push to main (`edge`) and on
-version tags. It has the `run` extra installed and `dscim-cil` as its
-entry point. Put the config and the data under one directory, with the
-paths in the config written as the container sees them (`/mnt/data/...`):
+The image is published to ghcr as `edge`, rebuilt on every push to
+main, and under a version tag for each release. It has the `run` extra
+installed and `dscim-cil` as its entry point.
+
+Create the directory the container will use. The inputs from the setup
+above are already in it; for real inputs, put them there instead.
+[applications/epa-scc](https://github.com/ClimateImpactLab/dscim-cil/tree/main/applications/epa-scc) downloads dscim-facts-epa's
+public input library, about 6 GB, with a script. The container runs as
+user 9876, so the directory must be writable by that user:
 
 ```shell
-mkdir -p data/results
+mkdir -p example-data
+chmod -R a+rwX example-data
+```
+
+Then pull the image and run example 1, with the data directory mounted at
+`/mnt/data` and used as the working directory so the config's relative
+paths resolve:
+
+```shell
 docker pull ghcr.io/climateimpactlab/dscim-cil:edge
+
+docker run --rm \
+    -v "$PWD/example-data:/mnt/data" \
+    -w /mnt/data \
+    ghcr.io/climateimpactlab/dscim-cil:edge \
+    run scenario.yml \
+    --sector labor \
+    --pulse-year 2020 \
+    --recipe adding_up \
+    --discounting euler_ramsey \
+    --eta 2.0 \
+    --rho 0.0001
 ```
 
-The container runs as user 9876, so `data/results` must be writable by
-that user (for example `chmod a+w data/results`). Then check the config
-and run it, mounting the directory twice, read-only for the config:
+The results appear in `example-data/results` on the host. Any other
+command takes the same mount, for example `validate sweep.yml` or
+`scc sweep.yml`.
 
-```shell
-docker run --rm -v ./conf:/mnt/conf:ro -v ./data:/mnt/data \
-    ghcr.io/climateimpactlab/dscim-cil:edge validate /mnt/conf/config.yml
+A floating tag such as `edge` moves with every push, so avoid it for
+runs that must be reproducible. Use a version tag or an image digest
+instead, and keep the config with the results; each run's
+`run_metadata.yaml` records the dscim version and commit it used.
 
-docker run --rm -v ./conf:/mnt/conf:ro -v ./data:/mnt/data \
-    ghcr.io/climateimpactlab/dscim-cil:edge run /mnt/conf/config.yml
+Build the image locally with `docker build -t dscim-cil:dev .`.
+
+### Command-line help
+
+```console
+$ dscim-cil --help
+Usage: dscim-cil [OPTIONS] COMMAND [ARGS]...
+
+  Command-line interface to the dscim SCC library.
+
+Options:
+  --log-level TEXT  [default: INFO]
+  --plain           Unadorned text output.
+  -h, --help        Show this message and exit.
+
+Commands:
+  combine      Merge coastal and AMEL coefficients per the combine block.
+  constraints  List the cross-option validity rules.
+  defaults     Show every option's effective value and where it came from.
+  explain      Show the full catalogue record for OPTION_NAME (and given...
+  options      List the catalogued dscim option surface.
+  plan         Show the whole pipeline for CONFIG_PATH as ordered,...
+  reduce       Collapse the batch dimension per the reduce block.
+  run          Expand the sweep and execute menu runs.
+  scc          Compose SCCs from the uncollapsed run outputs per the scc...
+  stages       Explain the pipeline: stages, data flow, and dimension...
+  sum-sectors  Build the aggregate sectors declared in the aggregates block.
+  validate     Validate CONFIG_PATH and report every problem found.
 ```
 
-Any subcommand works the same way, so the same two mounts serve
-`scc`, `plan`, and the others. The results appear in `data/results` on
-the host. Build the image locally with `docker build -t dscim-cil:dev .`.
+`run` takes the most options:
+
+```console
+$ dscim-cil run --help
+Usage: dscim-cil run [OPTIONS] CONFIG_PATH
+
+  Expand the sweep and execute menu runs.
+
+  Selector flags narrow the config's sweep; a config without a sweep block can
+  be driven entirely by flags.
+
+Options:
+  -c, --conf KEY=VALUE
+  --allow-unsupported
+  --dry-run
+  --verbose             Per-run detail in dry-run output.
+  --runs TEXT           Comma-separated 1-based run numbers for per-run
+                        detail.
+  --resume              Skip runs whose outputs all exist.
+  --sector TEXT         Keep only these sectors.
+  --pulse-year INTEGER  Keep only these pulse years.
+  --recipe TEXT         Keep only these recipes.
+  --discounting TEXT    Keep only these discounting types.
+  --mask TEXT           Keep only these ECS masks ('unmasked' for none).
+  --eta FLOAT           Select one eta/rho pair.
+  --rho FLOAT           Select one eta/rho pair.
+  -h, --help            Show this message and exit.
+```
+
+Options can also be set through environment variables named
+`DSCIM_CIL_`, then the command, then the option: `DSCIM_CIL_RUN_ETA=2.0`
+is `dscim-cil run --eta 2.0`.
+<!-- --8<-- [end:examples] -->
 
 ## Development
 

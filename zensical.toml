@@ -6,12 +6,13 @@ site_url = "https://climateimpactlab.github.io/dscim-cil"
 
 repo_name = "ClimateImpactLab/dscim-cil"
 repo_url = "https://github.com/ClimateImpactLab/dscim-cil"
-edit_uri = "edit/master/docs/"
+edit_uri = "edit/main/docs/"
 
 nav = [
   { "Overview" = "index.md" },
   { "Concepts" = "concepts.md" },
   { "Installation" = "installation.md" },
+  { "Examples" = "examples.md" },
   { "Commands" = "commands.md" },
   { "The config file" = "config.md" },
   { "The pipeline" = "pipeline.md" },
