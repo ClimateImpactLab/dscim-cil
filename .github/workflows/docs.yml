@@ -1,13 +1,9 @@
 name: Documentation
 
-# Manual trigger only until the site has been reviewed. To publish on
-# every push, add under `on:`:
-#   push:
-#     branches:
-#       - main
-# GitHub Pages must also be set to deploy from GitHub Actions in the
-# repository settings.
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
