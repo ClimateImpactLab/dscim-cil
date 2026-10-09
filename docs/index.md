@@ -20,12 +20,14 @@ source citation; see the [options reference](options.md).
 
 ## Where to start
 
+- [Concepts](concepts.md): the vocabulary, in short definitions.
 - [Installation](installation.md): the `run` extra and the container.
 - [Commands](commands.md): every command with its real output.
 - [The config file](config.md): the schema, both modes, and sweeps.
 - [The pipeline](pipeline.md): the stages and what each collapses.
 - [Reproducing the EPA numbers](epa.md): the published SC-CO2 values
   from the public input library.
+- [API reference](api_reference.md): generated from the docstrings.
 
 No data is needed to explore the tool:
 

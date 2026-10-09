@@ -23,7 +23,7 @@ tests = [
  "ruff>=0.8",
  "ty>=0.0.35",
 ]
-docs = ["zensical>=0.0.41"]
+docs = ["mkdocstrings[python]>=1.0.4", "zensical>=0.0.41"]
 dev = [{ include-group = "tests" }, { include-group = "docs" }]
 
 [build-system]

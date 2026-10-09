@@ -10,12 +10,14 @@ edit_uri = "edit/master/docs/"
 
 nav = [
   { "Overview" = "index.md" },
+  { "Concepts" = "concepts.md" },
   { "Installation" = "installation.md" },
   { "Commands" = "commands.md" },
   { "The config file" = "config.md" },
   { "The pipeline" = "pipeline.md" },
   { "Options reference" = "options.md" },
   { "Reproducing the EPA numbers" = "epa.md" },
+  { "API reference" = "api_reference.md" },
 ]
 
 [project.validation]
@@ -99,3 +101,32 @@ combine_header_slug = true
 custom_checkbox = true
 [project.markdown_extensions.pymdownx.tilde]
 [project.markdown_extensions.pymdownx.snippets]
+
+[project.plugins.mkdocstrings.handlers.python]
+inventories = ["https://docs.python.org/3/objects.inv"]
+paths = ["src"]
+
+[project.plugins.mkdocstrings.handlers.python.options]
+# See comprehensive docs here: https://mkdocstrings.github.io/python/usage/
+docstring_style = "numpy"
+# heading_level = 1
+separate_signature = true
+# preload_modules = ["xarray"]  # Xarray does not work with intersphinx inventories...? (https://github.com/pydata/xarray/issues/4279)
+members_order = "source"
+parameter_headings = false
+type_parameter_headings = true
+docstring_section_style = "list"
+show_object_full_path = false
+show_if_no_docstring = true
+show_root_heading = true
+show_root_toc_entry = true
+show_symbol_type_heading = true
+show_symbol_type_toc = true
+show_signature_annotations = true
+show_signature_type_parameters = true
+unwrap_annotated = true
+merge_init_into_class = true
+signature_crossrefs = true
+inherited_members = true
+show_source = false
+line_length = 88
